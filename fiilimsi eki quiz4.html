@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fiilimsi Ekleri Quiz</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            font-size: 24px;
+        }
+        
+        .sound-toggle {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .sound-toggle:hover {
+            background-color: #2980b9;
+        }
+        
+        .sound-toggle.muted {
+            background-color: #7f8c8d;
+        }
+        
+        .set-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .set-btn {
+            flex: 1;
+            padding: 12px;
+            background-color: #ecf0f1;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .set-btn:hover {
+            background-color: #d5dbdb;
+        }
+        
+        .set-btn.active {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .question-container {
+            margin-bottom: 30px;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .question-text {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .options {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .option {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+        
+        .option:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .option.correct {
+            background-color: #2ecc71;
+            color: white;
+            border-color: #27ae60;
+        }
+        
+        .option.incorrect {
+            background-color: #e74c3c;
+            color: white;
+            border-color: #c0392b;
+        }
+        
+        .feedback {
+            margin-top: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            height: 20px;
+        }
+        
+        .feedback.correct {
+            color: #27ae60;
+        }
+        
+        .feedback.incorrect {
+            color: #c0392b;
+        }
+        
+        .score-container {
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .progress {
+            margin-top: 15px;
+            height: 8px;
+            background-color: #ecf0f1;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background-color: #3498db;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .next-btn {
+            display: block;
+            margin: 20px auto 0;
+            padding: 12px 25px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .next-btn:hover {
+            background-color: #2980b9;
+        }
+        
+        .completion-message {
+            text-align: center;
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #d5f4e6;
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .completion-message h2 {
+            color: #27ae60;
+            margin-bottom: 10px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+        
+        .action-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .wrong-answers-btn {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .wrong-answers-btn:hover {
+            background-color: #c0392b;
+        }
+        
+        .next-set-btn {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .next-set-btn:hover {
+            background-color: #2980b9;
+        }
+        
+        .restart-btn {
+            background-color: #2c3e50;
+            color: white;
+        }
+        
+        .restart-btn:hover {
+            background-color: #1a252f;
+        }
+        
+        @media (max-width: 600px) {
+            .options {
+                flex-direction: column;
+            }
+            
+            .set-selector {
+                flex-direction: column;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Fiilimsi Ekleri Quiz</h1>
+            <button class="sound-toggle" id="soundToggle">Sesi Kapat</button>
+        </header>
+        
+        <div class="set-selector">
+            <button class="set-btn active" data-set="1">Set 1: Sıfat-Fiil</button>
+            <button class="set-btn" data-set="2">Set 2: Zarf-Fiil</button>
+            <button class="set-btn" data-set="3">Set 3: İsim-Fiil</button>
+        </div>
+        
+        <div class="question-container">
+            <div class="question-text" id="questionText"></div>
+            <div class="options">
+                <div class="option" id="option1"></div>
+                <div class="option" id="option2"></div>
+            </div>
+            <div class="feedback" id="feedback"></div>
+        </div>
+        
+        <div class="progress">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        
+        <div class="score-container">
+            Skor: <span id="score">0</span> / <span id="totalQuestions">6</span>
+        </div>
+        
+        <button class="next-btn" id="nextBtn">Sonraki Soru</button>
+        
+        <div class="completion-message" id="completionMessage">
+            <h2 id="completionTitle">Tebrikler! Seti Tamamladınız</h2>
+            <p>Son skorunuz: <span id="finalScore">0</span> / 6</p>
+            <div class="action-buttons" id="actionButtons">
+                <button class="action-btn wrong-answers-btn" id="wrongAnswersBtn">Yanlışları Tekrar Sor</button>
+                <button class="action-btn next-set-btn" id="nextSetBtn">Sonraki Set</button>
+                <button class="action-btn restart-btn" id="restartBtn">Başka Set Dene</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Fiilimsi ekleri veritabanı
+        const ekler = {
+            isimFiil: ["-ma, -me", "-ış, -iş, -uş, -üş", "-mak,-mek"],
+            sifatFiil: ["-an, -en", "-ası, -esi", "-maz, -mez", "-ar, -er", "-dık, -dik, -duk, -dük", "-acak, -ecek", "-mış, -miş, -muş, -müş"],
+            zarfFiil: ["-ken", "-alı, -eli", "-madan, -meden", "-ince, -ınca", "-ıp, -ip, -up, -üp", "-erek, -arak", "-dıkça, -dikçe", "-e….-e, -a….-a", "-r…..-maz", "-casına, -cesine", "-meksizin, -maksızın", "-dığında, -diğinde"]
+        };
+
+        // Oyun durumu
+        let state = {
+            currentSet: 1,
+            currentQuestion: 0,
+            score: 0,
+            soundEnabled: true,
+            questions: [],
+            wrongAnswers: [],
+            autoAdvanceTimeout: null,
+            completedSets: 0
+        };
+
+        // DOM elementleri
+        const questionText = document.getElementById('questionText');
+        const option1 = document.getElementById('option1');
+        const option2 = document.getElementById('option2');
+        const feedback = document.getElementById('feedback');
+        const scoreElement = document.getElementById('score');
+        const totalQuestionsElement = document.getElementById('totalQuestions');
+        const progressBar = document.getElementById('progressBar');
+        const nextBtn = document.getElementById('nextBtn');
+        const soundToggle = document.getElementById('soundToggle');
+        const setButtons = document.querySelectorAll('.set-btn');
+        const completionMessage = document.getElementById('completionMessage');
+        const completionTitle = document.getElementById('completionTitle');
+        const finalScore = document.getElementById('finalScore');
+        const actionButtons = document.getElementById('actionButtons');
+        const wrongAnswersBtn = document.getElementById('wrongAnswersBtn');
+        const nextSetBtn = document.getElementById('nextSetBtn');
+        const restartBtn = document.getElementById('restartBtn');
+
+        // Ses efekti - Daha iyi bir ses kullanıyoruz
+        const correctSound = new Audio("data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA==");
+        // Alternatif ses (tarayıcı uyumluluğu için)
+        function playDingSound() {
+            if (!state.soundEnabled) return;
+            
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = 800;
+                oscillator.type = 'sine';
+                gainNode.gain.value = 0.1;
+                
+                oscillator.start();
+                gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.5);
+                oscillator.stop(audioContext.currentTime + 0.5);
+            } catch (e) {
+                console.log("Web Audio API desteklenmiyor");
+                // Base64 sesi dene
+                correctSound.play().catch(err => console.log("Ses çalınamadı:", err));
+            }
+        }
+
+        // Set değiştirme
+        setButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const setNumber = parseInt(button.getAttribute('data-set'));
+                if (setNumber !== state.currentSet) {
+                    setButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    state.currentSet = setNumber;
+                    resetGame();
+                    generateQuestions();
+                    displayQuestion();
+                }
+            });
+        });
+
+        // Sesi aç/kapat
+        soundToggle.addEventListener('click', () => {
+            state.soundEnabled = !state.soundEnabled;
+            soundToggle.textContent = state.soundEnabled ? 'Sesi Kapat' : 'Sesi Aç';
+            soundToggle.classList.toggle('muted', !state.soundEnabled);
+        });
+
+        // Sonraki soru butonu
+        nextBtn.addEventListener('click', () => {
+            // Önceki zamanlayıcıyı temizle
+            if (state.autoAdvanceTimeout) {
+                clearTimeout(state.autoAdvanceTimeout);
+            }
+            goToNextQuestion();
+        });
+
+        // Yanlışları tekrar sor butonu
+        wrongAnswersBtn.addEventListener('click', () => {
+            if (state.wrongAnswers.length > 0) {
+                state.questions = [...state.wrongAnswers];
+                state.wrongAnswers = [];
+                state.currentQuestion = 0;
+                state.score = 0;
+                completionMessage.style.display = 'none';
+                displayQuestion();
+            }
+        });
+
+        // Sonraki set butonu
+        nextSetBtn.addEventListener('click', () => {
+            state.currentSet++;
+            if (state.currentSet > 3) state.currentSet = 1;
+            
+            // Set butonunu güncelle
+            setButtons.forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`.set-btn[data-set="${state.currentSet}"]`).classList.add('active');
+            
+            resetGame();
+            generateQuestions();
+            displayQuestion();
+        });
+
+        // Yeniden başlat butonu
+        restartBtn.addEventListener('click', () => {
+            completionMessage.style.display = 'none';
+            resetGame();
+            generateQuestions();
+            displayQuestion();
+        });
+
+        // Bir sonraki soruya geç
+        function goToNextQuestion() {
+            state.currentQuestion++;
+            if (state.currentQuestion < state.questions.length) {
+                displayQuestion();
+            } else {
+                showCompletionMessage();
+            }
+        }
+
+        // Soruları oluştur
+        function generateQuestions() {
+            state.questions = [];
+            
+            let correctEks, incorrectPool;
+            
+            // Set'e göre doğru ve yanlış ek havuzlarını belirle
+            if (state.currentSet === 1) {
+                correctEks = [...ekler.sifatFiil];
+                incorrectPool = [...ekler.isimFiil, ...ekler.zarfFiil];
+            } else if (state.currentSet === 2) {
+                correctEks = [...ekler.zarfFiil];
+                incorrectPool = [...ekler.isimFiil, ...ekler.sifatFiil];
+            } else {
+                correctEks = [...ekler.isimFiil];
+                incorrectPool = [...ekler.sifatFiil, ...ekler.zarfFiil];
+            }
+            
+            // 6 soru oluştur
+            for (let i = 0; i < 6; i++) {
+                // Doğru cevap için rastgele bir ek seç
+                const correctIndex = Math.floor(Math.random() * correctEks.length);
+                const correctEk = correctEks[correctIndex];
+                correctEks.splice(correctIndex, 1); // Aynı ek tekrar kullanılmasın
+                
+                // Yanlış cevap için rastgele bir ek seç
+                const incorrectEk = incorrectPool[Math.floor(Math.random() * incorrectPool.length)];
+                
+                // Hangi ek türü olduğunu belirle
+                let incorrectType;
+                if (ekler.isimFiil.includes(incorrectEk)) {
+                    incorrectType = "isim-fiil";
+                } else if (ekler.sifatFiil.includes(incorrectEk)) {
+                    incorrectType = "sıfat-fiil";
+                } else {
+                    incorrectType = "zarf-fiil";
+                }
+                
+                // Soruyu ekle
+                state.questions.push({
+                    correct: correctEk,
+                    incorrect: incorrectEk,
+                    incorrectType: incorrectType
+                });
+            }
+        }
+
+        // Soruyu göster
+        function displayQuestion() {
+            const question = state.questions[state.currentQuestion];
+            
+            // Soru metnini ayarla
+            if (state.currentSet === 1) {
+                questionText.textContent = "Hangisi 'sıfat-fiil' ekidir?";
+            } else if (state.currentSet === 2) {
+                questionText.textContent = "Hangisi 'zarf-fiil' ekidir?";
+            } else {
+                questionText.textContent = "Hangisi 'isim-fiil' ekidir?";
+            }
+            
+            // Seçenekleri rastgele sırala
+            const options = [question.correct, question.incorrect];
+            if (Math.random() > 0.5) {
+                options.reverse();
+            }
+            
+            // Seçenekleri göster
+            option1.textContent = options[0];
+            option2.textContent = options[1];
+            
+            // Seçeneklerin durumunu sıfırla
+            option1.className = 'option';
+            option2.className = 'option';
+            feedback.textContent = '';
+            feedback.className = 'feedback';
+            
+            // İlerleme çubuğunu güncelle
+            progressBar.style.width = `${(state.currentQuestion / state.questions.length) * 100}%`;
+            
+            // Skoru güncelle
+            scoreElement.textContent = state.score;
+            totalQuestionsElement.textContent = state.questions.length;
+            
+            // Sonraki soru butonunu gizle
+            nextBtn.style.display = 'none';
+            
+            // Seçeneklere tıklama olaylarını ekle
+            option1.onclick = () => checkAnswer(option1, options[0], question);
+            option2.onclick = () => checkAnswer(option2, options[1], question);
+        }
+
+        // Cevabı kontrol et
+        function checkAnswer(selectedOption, selectedAnswer, question) {
+            // Önceki zamanlayıcıyı temizle
+            if (state.autoAdvanceTimeout) {
+                clearTimeout(state.autoAdvanceTimeout);
+            }
+            
+            // Tüm seçeneklere tıklanmasını engelle
+            option1.onclick = null;
+            option2.onclick = null;
+            
+            const isCorrect = selectedAnswer === question.correct;
+            
+            if (isCorrect) {
+                selectedOption.classList.add('correct');
+                feedback.textContent = "Doğru!";
+                feedback.classList.add('correct');
+                state.score++;
+                scoreElement.textContent = state.score;
+                
+                // Ses çal
+                playDingSound();
+            } else {
+                selectedOption.classList.add('incorrect');
+                feedback.textContent = `Yanlış! Bu ek "${question.incorrectType}" ekidir.`;
+                feedback.classList.add('incorrect');
+                
+                // Yanlış cevabı kaydet
+                state.wrongAnswers.push(question);
+                
+                // Doğru cevabı da göster
+                if (option1.textContent === question.correct) {
+                    option1.classList.add('correct');
+                } else {
+                    option2.classList.add('correct');
+                }
+            }
+            
+            // 1 saniye sonra otomatik olarak bir sonraki soruya geç
+            state.autoAdvanceTimeout = setTimeout(() => {
+                goToNextQuestion();
+            }, 1000);
+            
+            // Sonraki soru butonunu göster (manuel geçiş için)
+            nextBtn.style.display = 'block';
+        }
+
+        // Tamamlanma mesajını göster
+        function showCompletionMessage() {
+            state.completedSets++;
+            
+            completionTitle.textContent = "Tebrikler! Seti Tamamladınız";
+            finalScore.textContent = state.score;
+            
+            // Butonları yapılandır
+            if (state.completedSets >= 2 && state.wrongAnswers.length > 0) {
+                // 2 set tamamlandı ve yanlışlar var
+                wrongAnswersBtn.style.display = 'inline-block';
+                nextSetBtn.style.display = 'inline-block';
+                restartBtn.style.display = 'inline-block';
+            } else {
+                // Henüz 2 set tamamlanmadı veya yanlış yok
+                wrongAnswersBtn.style.display = 'none';
+                nextSetBtn.style.display = 'inline-block';
+                restartBtn.style.display = 'inline-block';
+            }
+            
+            completionMessage.style.display = 'block';
+        }
+
+        // Oyunu sıfırla
+        function resetGame() {
+            state.currentQuestion = 0;
+            state.score = 0;
+            progressBar.style.width = '0%';
+            scoreElement.textContent = '0';
+            nextBtn.style.display = 'none';
+            completionMessage.style.display = 'none';
+            
+            // Zamanlayıcıyı temizle
+            if (state.autoAdvanceTimeout) {
+                clearTimeout(state.autoAdvanceTimeout);
+            }
+        }
+
+        // Uygulamayı başlat
+        generateQuestions();
+        displayQuestion();
+    </script>
+</body>
+</html>
